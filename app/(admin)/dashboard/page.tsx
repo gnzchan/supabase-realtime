@@ -5,8 +5,14 @@
 */
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createClient } from "@/lib/supabase/server";
+import { ProductsTable } from "./components/products-table";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: products } = await supabase.from("products").select();
+
+  console.log(products);
   return (
     <>
       <Tabs defaultValue="quotes">
@@ -15,7 +21,9 @@ export default function DashboardPage() {
           <TabsTrigger value="products">Products</TabsTrigger>
         </TabsList>
         <TabsContent value="quotes">quotes</TabsContent>
-        <TabsContent value="products">products</TabsContent>
+        <TabsContent value="products">
+          {products && <ProductsTable products={products} />}
+        </TabsContent>
       </Tabs>
     </>
   );
