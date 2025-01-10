@@ -14,7 +14,7 @@ import { notFound } from "next/navigation";
 import { acceptQuote, rejectQuote } from "./actions/quote-update";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -26,11 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function QuotePage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function QuotePage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
 

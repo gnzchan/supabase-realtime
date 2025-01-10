@@ -28,11 +28,7 @@ export function QuotesTable() {
       .on(
         REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
         { event: "UPDATE", schema: "public", table: "quotes" },
-        (payload: {
-          new: BrowserQuote;
-          old: BrowserQuote;
-          eventType: "UPDATE";
-        }) => {
+        (payload) => {
           setQuotes(
             (currentQuotes) =>
               currentQuotes?.map((quote) =>
@@ -48,7 +44,7 @@ export function QuotesTable() {
     return () => {
       channel.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, setQuotes]);
 
   if (!quotes) return null;
 
