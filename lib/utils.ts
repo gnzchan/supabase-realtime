@@ -22,7 +22,5 @@ export function getStatusColor(status: string) {
       return "text-red-500";
     case "Pending":
       return "text-yellow-500";
-    default:
-      return "";
   }
 }

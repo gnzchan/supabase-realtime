@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createBrowserClient } from "@/lib/supabase/browser";
-import { calculateTotal, getStatusColor } from "@/lib/utils";
+import { calculateTotal, cn, getStatusColor } from "@/lib/utils";
 import { BrowserQuote } from "@/types";
 import { REALTIME_LISTEN_TYPES } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
@@ -107,7 +107,9 @@ export function QuotesTable() {
               </ul>
             </TableCell>
             <TableCell>${calculateTotal(quote)}</TableCell>
-            <TableCell className={`font-bold ${getStatusColor(quote.status)}`}>
+            <TableCell
+              className={cn("font-bold", getStatusColor(quote.status))}
+            >
               {quote.status}
             </TableCell>
             <TableCell>
