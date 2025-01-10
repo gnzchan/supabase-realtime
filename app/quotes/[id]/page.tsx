@@ -1,17 +1,30 @@
-import { Database } from "@/database.types";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
-import { calculateTotal } from "@/lib/utils";
+import { calculateTotal, getStatusColor } from "@/lib/utils";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { acceptQuote, rejectQuote } from "./actions/quote-update";
 
-export type Quote = Database["public"]["Tables"]["quotes"]["Row"] & {
-  quote_items: (Database["public"]["Tables"]["quote_items"]["Row"] & {
-    products: {
-      name: string;
-      price: number;
-    };
-  })[];
-};
+interface Props {
+  params: { id: string };
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+
+  return {
+    title: `Quote #${id} | GnzChan Quotation Builder`,
+    description: "Review your quotation details and respond with your decision",
+  };
+}
 
 export default async function QuotePage({
   params,
@@ -23,7 +36,7 @@ export default async function QuotePage({
 
   const { data: quote } = await supabase
     .from("quotes")
-    .select(`*, quote_items(*, products(name, price))`)
+    .select(`*, quote_items(*, product:products(name, price))`)
     .eq("id", id)
     .single();
 
@@ -45,64 +58,55 @@ export default async function QuotePage({
 
         <div className="mb-6">
           <h2 className="mb-2 text-lg font-semibold">Items</h2>
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left">Product</th>
-                  <th className="px-4 py-2 text-left">Quantity</th>
-                  <th className="px-4 py-2 text-left">Price</th>
-                  <th className="px-4 py-2 text-left">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quote.quote_items.map((item) => (
-                  <tr key={item.id} className="border-t">
-                    <td className="px-4 py-2">{item.products.name}</td>
-                    <td className="px-4 py-2">{item.quantity}</td>
-                    <td className="px-4 py-2">${item.products.price}</td>
-                    <td className="px-4 py-2">
-                      ${((item.quantity ?? 1) * item.products.price).toFixed(2)}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="border-t bg-gray-50">
-                  <td
-                    colSpan={3}
-                    className="px-4 py-2 text-right font-semibold"
-                  >
-                    Total:
-                  </td>
-                  <td className="px-4 py-2 font-semibold">
-                    ${calculateTotal(quote)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Subtotal</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {quote.quote_items.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.product.name}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>${item.product.price}</TableCell>
+                  <TableCell>
+                    ${((item.quantity ?? 1) * item.product.price).toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              ))}
+              <TableRow>
+                <TableCell colSpan={3} className="text-right font-semibold">
+                  Total:
+                </TableCell>
+                <TableCell className="font-semibold">
+                  ${calculateTotal(quote)}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
 
-        <div className="text-sm text-gray-500">
+        <div className={`text-sm ${getStatusColor(quote.status)}`}>
           Quote Status: {quote.status}
         </div>
 
         {quote.status === "Pending" && (
           <div className="mt-4 flex gap-4">
-            <form action={() => acceptQuote(id)}>
-              <button
-                type="submit"
-                className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
-              >
+            <form action={acceptQuote}>
+              <input type="hidden" name="id" value={id} />
+              <Button type="submit" className="bg-green-500 hover:bg-green-600">
                 Accept Quote
-              </button>
+              </Button>
             </form>
-            <form action={() => rejectQuote(id)}>
-              <button
-                type="submit"
-                className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-              >
+            <form action={rejectQuote}>
+              <input type="hidden" name="id" value={id} />
+              <Button type="submit" className="bg-red-500 hover:bg-red-600">
                 Reject Quote
-              </button>
+              </Button>
             </form>
           </div>
         )}

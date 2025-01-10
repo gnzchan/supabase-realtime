@@ -1,6 +1,6 @@
 "use client";
 
-import { Product, Quote } from "@/types";
+import { BrowserQuote, Product } from "@/types";
 import {
   createContext,
   Dispatch,
@@ -12,27 +12,8 @@ import {
 
 interface DashboardContextType {
   products: Product[] | null;
-  quotes:
-    | (Quote & {
-        quote_items: any[];
-      })[]
-    | null;
-  setQuotes: Dispatch<
-    SetStateAction<
-      | ({
-          created_at: string;
-          id: string;
-          recipient_email: string;
-          recipient_name: string;
-          responded_at: string | null;
-          sent_at: string | null;
-          status: string;
-        } & {
-          quote_items: any[];
-        })[]
-      | null
-    >
-  >;
+  quotes: BrowserQuote[] | null;
+  setQuotes: Dispatch<SetStateAction<BrowserQuote[] | null>>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(
@@ -46,13 +27,10 @@ export function DashboardProvider({
 }: {
   children: ReactNode;
   products: Product[] | null;
-  quotes:
-    | (Quote & {
-        quote_items: any[];
-      })[]
-    | null;
+  quotes: BrowserQuote[] | null;
 }) {
   const [quotes, setQuotes] = useState(initialQuotes);
+
   return (
     <DashboardContext.Provider value={{ products, quotes, setQuotes }}>
       {children}

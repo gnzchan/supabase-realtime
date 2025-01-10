@@ -1,6 +1,5 @@
 "use client";
 
-import { Quote } from "@/app/quotes/[id]/page";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,7 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createBrowserClient } from "@/lib/supabase/browser";
-import { calculateTotal } from "@/lib/utils";
+import { calculateTotal, getStatusColor } from "@/lib/utils";
+import { BrowserQuote } from "@/types";
 import { REALTIME_LISTEN_TYPES } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ export function QuotesTable() {
 
   if (!quotes) return null;
 
-  const handleSendEmail = async (quote: Quote) => {
+  const handleSendEmail = async (quote: BrowserQuote) => {
     setSendingEmail(quote.id);
     try {
       const response = await fetch("/api/email", {
@@ -60,7 +60,7 @@ export function QuotesTable() {
           customerName: quote.recipient_name,
           customerEmail: quote.recipient_email,
           quoteNumber: quote.id,
-          quoteLink: `${window.location.origin}/quotes/${quote.id}`, // Adjust this URL based on your actual quote viewing route
+          quoteLink: `${window.location.origin}/quotes/${quote.id}`,
         }),
       });
 
@@ -107,19 +107,21 @@ export function QuotesTable() {
               </ul>
             </TableCell>
             <TableCell>${calculateTotal(quote)}</TableCell>
-            <TableCell>{quote.status}</TableCell>
+            <TableCell className={`font-bold ${getStatusColor(quote.status)}`}>
+              {quote.status}
+            </TableCell>
             <TableCell>
               {new Date(quote.created_at).toLocaleDateString()}
             </TableCell>
             <TableCell>
               {quote.sent_at
                 ? new Date(quote.sent_at).toLocaleDateString()
-                : "N/A"}
+                : "-"}
             </TableCell>
             <TableCell>
               {quote.responded_at
                 ? new Date(quote.responded_at).toLocaleDateString()
-                : "N/A"}
+                : "-"}
             </TableCell>
             <TableCell>
               <Button

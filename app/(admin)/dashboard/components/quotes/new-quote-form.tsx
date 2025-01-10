@@ -1,7 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Product } from "@/types";
 import { useState } from "react";
+import { toast } from "sonner";
 import { createQuote } from "../../actions/create-quote";
 import { useDashboard } from "../../context/dashboard-context";
 
@@ -56,8 +58,9 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
       setName("");
       setQuantities({});
       onSuccess?.();
+      toast.success("Successfully created quote");
     } else {
-      // Handle error - you might want to show an error message to the user
+      toast.error("Failed to create quote");
       console.error("Failed to create quote");
     }
   }
@@ -121,23 +124,23 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => updateQuantity(product.id, -1)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
               >
                 -
-              </button>
+              </Button>
               <span className="w-12 text-center">
                 {quantities[product.id] || 0}
               </span>
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => updateQuantity(product.id, 1)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
               >
                 +
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -147,12 +150,7 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
         Total Price: ${calculateTotal(products, quantities)}
       </div>
 
-      <button
-        type="submit"
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-      >
-        Create Quote
-      </button>
+      <Button type="submit">Create Quote</Button>
     </form>
   );
 }

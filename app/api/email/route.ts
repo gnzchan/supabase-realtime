@@ -17,9 +17,9 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: "GnzChan <noreply@gonzaleschan.com>",
+      from: "GnzChan <onboarding@resend.dev>",
       to: [customerEmail],
-      subject: `Quote ${quoteNumber} - Your Quotation Details`,
+      subject: `Quote #${quoteNumber} - Your Quotation Details`,
       react: QuoteConfirmation({
         customerName,
         quoteLink,
@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       return Response.json({ error }, { status: 500 });
     }
 
-    // Update quote's sent_at in Supabase
     const supabase = await createClient();
     const { error: updateError } = await supabase
       .from("quotes")

@@ -4,6 +4,12 @@ import { ProductsTable } from "./components/products/products-table";
 import { QuotesSection } from "./components/quotes/quotes-section";
 import { DashboardProvider } from "./context/dashboard-context";
 
+export const metadata = {
+  title: "Admin Dashboard | GnzChan Quotation Builder",
+  description:
+    "Manage quotes, track responses, and send professional quotations to clients in real-time",
+};
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 

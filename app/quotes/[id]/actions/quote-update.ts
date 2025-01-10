@@ -1,8 +1,10 @@
+"use server";
+
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export const acceptQuote = async (id: string) => {
-  "use server";
+export async function acceptQuote(formData: FormData) {
+  const id = formData.get("id") as string;
   const supabase = await createClient();
   await supabase
     .from("quotes")
@@ -12,17 +14,17 @@ export const acceptQuote = async (id: string) => {
     })
     .eq("id", id);
   revalidatePath(`/quotes/${id}`);
-};
+}
 
-export const rejectQuote = async (id: string) => {
-  "use server";
+export async function rejectQuote(formData: FormData) {
+  const id = formData.get("id") as string;
   const supabase = await createClient();
   await supabase
     .from("quotes")
     .update({
-      status: "Rejected",
+      status: "Denied",
       responded_at: new Date().toISOString(),
     })
     .eq("id", id);
   revalidatePath(`/quotes/${id}`);
-};
+}
