@@ -1,5 +1,7 @@
 "use client";
 
+import { Quote } from "@/app/quotes/[id]/page";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,29 +10,72 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Database } from "@/database.types";
+import { createBrowserClient } from "@/lib/supabase/browser";
+import { calculateTotal } from "@/lib/utils";
+import { REALTIME_LISTEN_TYPES } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useDashboard } from "../../context/dashboard-context";
 
-type Quote = Database["public"]["Tables"]["quotes"]["Row"] & {
-  quote_items: (Database["public"]["Tables"]["quote_items"]["Row"] & {
-    product: {
-      name: string;
-      price: number;
-    };
-  })[];
-};
-
 export function QuotesTable() {
-  const { quotes } = useDashboard();
+  const supabase = createBrowserClient();
+  const { quotes, setQuotes } = useDashboard();
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("quotes")
+      .on(
+        REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
+        { event: "UPDATE", schema: "public", table: "quotes" },
+        (payload: any) => {
+          setQuotes(
+            (currentQuotes) =>
+              currentQuotes?.map((quote) =>
+                quote.id === payload.new.id
+                  ? { ...quote, ...payload.new }
+                  : quote,
+              ) ?? [],
+          );
+        },
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe;
+    };
+  }, [supabase]);
 
   if (!quotes) return null;
-  function calculateTotal(quote: Quote) {
-    return quote.quote_items
-      .reduce((sum, item) => {
-        return sum + (item.quantity ?? 0) * item.product.price;
-      }, 0)
-      .toFixed(2);
-  }
+
+  const handleSendEmail = async (quote: Quote) => {
+    setSendingEmail(quote.id);
+    try {
+      const response = await fetch("/api/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerName: quote.recipient_name,
+          customerEmail: quote.recipient_email,
+          quoteNumber: quote.id,
+          quoteLink: `${window.location.origin}/quotes/${quote.id}`, // Adjust this URL based on your actual quote viewing route
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+
+      toast.success("Email sent successfully!");
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.error("Failed to send email. Please try again.");
+    } finally {
+      setSendingEmail(null);
+    }
+  };
 
   return (
     <Table>
@@ -41,7 +86,10 @@ export function QuotesTable() {
           <TableHead>Products</TableHead>
           <TableHead>Total</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Date</TableHead>
+          <TableHead>Date Created</TableHead>
+          <TableHead>Date Email Sent</TableHead>
+          <TableHead>Responded at</TableHead>
+          <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -62,6 +110,30 @@ export function QuotesTable() {
             <TableCell>{quote.status}</TableCell>
             <TableCell>
               {new Date(quote.created_at).toLocaleDateString()}
+            </TableCell>
+            <TableCell>
+              {quote.sent_at
+                ? new Date(quote.sent_at).toLocaleDateString()
+                : "N/A"}
+            </TableCell>
+            <TableCell>
+              {quote.responded_at
+                ? new Date(quote.responded_at).toLocaleDateString()
+                : "N/A"}
+            </TableCell>
+            <TableCell>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={sendingEmail === quote.id}
+                onClick={() => handleSendEmail(quote)}
+              >
+                {sendingEmail === quote.id
+                  ? "Sending..."
+                  : quote.sent_at
+                    ? "Resend Email"
+                    : "Send Email"}
+              </Button>
             </TableCell>
           </TableRow>
         ))}
