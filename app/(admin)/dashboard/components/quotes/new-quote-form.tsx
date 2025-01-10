@@ -35,7 +35,7 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
     }));
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit() {
     const items = Object.entries(quantities)
       .filter(([, quantity]) => quantity > 0)
       .map(([productId, quantity]) => ({
