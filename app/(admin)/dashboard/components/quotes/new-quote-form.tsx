@@ -147,7 +147,12 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
         Total Price: ${calculateTotal(products, quantities)}
       </div>
 
-      <Button type="submit">Create Quote</Button>
+      <Button
+        type="submit"
+        disabled={parseInt(calculateTotal(products, quantities)) === 0}
+      >
+        Create Quote
+      </Button>
     </form>
   );
 }
