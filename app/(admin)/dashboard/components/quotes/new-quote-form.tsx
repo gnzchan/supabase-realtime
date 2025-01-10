@@ -39,7 +39,7 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
     e.preventDefault();
 
     const items = Object.entries(quantities)
-      .filter(([productId, quantity]) => quantity > 0)
+      .filter(([, quantity]) => quantity > 0)
       .map(([productId, quantity]) => ({
         productId,
         quantity,

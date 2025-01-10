@@ -46,7 +46,7 @@ export function QuotesTable() {
       .subscribe();
 
     return () => {
-      channel.unsubscribe;
+      channel.unsubscribe();
     };
   }, [supabase]);
 
