@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -7,12 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDashboard } from "../../context/dashboard-context";
 
-import { Tables } from "@/database.types";
+export function ProductsTable() {
+  const { products } = useDashboard();
 
-type Product = Tables<"products">;
+  if (!products) return null;
 
-export const ProductsTable = ({ products }: { products: Product[] }) => {
   return (
     <Table>
       <TableCaption>A list of your available products.</TableCaption>
@@ -25,7 +28,7 @@ export const ProductsTable = ({ products }: { products: Product[] }) => {
       </TableHeader>
       <TableBody>
         {products.map((product) => (
-          <TableRow>
+          <TableRow key={product.id}>
             <TableCell className="font-medium">{product.id}</TableCell>
             <TableCell>{product.name}</TableCell>
             <TableCell className="text-right">${product.price}</TableCell>
@@ -34,4 +37,4 @@ export const ProductsTable = ({ products }: { products: Product[] }) => {
       </TableBody>
     </Table>
   );
-};
+}

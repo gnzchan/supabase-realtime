@@ -11,19 +11,19 @@ export type Database = {
     Tables: {
       products: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           name: string
           price: number
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           name: string
           price: number
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           name?: string
           price?: number
@@ -32,25 +32,25 @@ export type Database = {
       }
       quote_items: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          product_id: string | null
+          product_id: string
           quantity: number | null
-          quote_id: string | null
+          quote_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          product_id?: string | null
+          product_id: string
           quantity?: number | null
-          quote_id?: string | null
+          quote_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          product_id?: string | null
+          product_id?: string
           quantity?: number | null
-          quote_id?: string | null
+          quote_id?: string
         }
         Relationships: [
           {
@@ -71,31 +71,31 @@ export type Database = {
       }
       quotes: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           recipient_email: string
           recipient_name: string
           responded_at: string | null
           sent_at: string | null
-          status: string | null
+          status: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           recipient_email: string
           recipient_name: string
           responded_at?: string | null
           sent_at?: string | null
-          status?: string | null
+          status?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           recipient_email?: string
           recipient_name?: string
           responded_at?: string | null
           sent_at?: string | null
-          status?: string | null
+          status?: string
         }
         Relationships: []
       }
