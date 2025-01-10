@@ -28,7 +28,11 @@ export function QuotesTable() {
       .on(
         REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
         { event: "UPDATE", schema: "public", table: "quotes" },
-        (payload: any) => {
+        (payload: {
+          new: BrowserQuote;
+          old: BrowserQuote;
+          eventType: "UPDATE";
+        }) => {
           setQuotes(
             (currentQuotes) =>
               currentQuotes?.map((quote) =>

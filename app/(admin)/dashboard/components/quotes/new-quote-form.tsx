@@ -39,7 +39,7 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
     e.preventDefault();
 
     const items = Object.entries(quantities)
-      .filter(([_, quantity]) => quantity > 0)
+      .filter(([productId, quantity]) => quantity > 0)
       .map(([productId, quantity]) => ({
         productId,
         quantity,
@@ -75,7 +75,6 @@ export function NewQuoteForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Customer Information Section */}
       <div className="space-y-4">
         <div>
           <label

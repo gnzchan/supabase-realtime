@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: "GnzChan <onboarding@resend.dev>",
+      from: "Quotation Builder - GnzChan <noreply@gonzaleschan.com>",
       to: [customerEmail],
       subject: `Quote #${quoteNumber} - Your Quotation Details`,
       react: QuoteConfirmation({
